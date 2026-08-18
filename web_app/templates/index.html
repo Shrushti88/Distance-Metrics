@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Similarity Measurement Using Distance Metrics | Pattern Recognition PBL</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <!-- MathJax for formula rendering -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="badge">Project-Based Learning (PBL) &bull; Pattern Recognition</div>
+      <h1>Similarity Measurement Using Distance Metrics</h1>
+      <p>A Comprehensive Study & Benchmarking of Euclidean ($L_2$), Manhattan ($L_1$), and Cosine Distance Measures Across Low-to-High Dimensional Datasets.</p>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('overview')">1. Theory & Overview</button>
+      <button class="tab-btn" onclick="switchTab('calculator')">2. Live Vector Calculator</button>
+      <button class="tab-btn" onclick="switchTab('playground')">3. 2D Decision Boundary Playground</button>
+      <button class="tab-btn" onclick="switchTab('benchmarks')">4. Multi-Dataset Benchmarks</button>
+      <button class="tab-btn" onclick="switchTab('search')">5. Semantic Similarity Search</button>
+      <button class="tab-btn" onclick="switchTab('gallery')">6. Publication Figures</button>
+    </div>
+
+    <!-- TAB 1: Theory & Overview -->
+    <div id="tab-overview" class="tab-content active">
+      <div class="grid-3">
+        <div class="card">
+          <h3 class="pill-euc">Euclidean Distance ($L_2$)</h3>
+          <p>Measures the true straight-line distance between points in Euclidean space.</p>
+          <div class="metric-box">
+            <div class="metric-title">Formula</div>
+            <div style="font-size: 1.05rem; margin: 8px 0; color:#93c5fd;">
+              $$d(u, v) = \sqrt{\sum_{i=1}^n (u_i - v_i)^2} = \|u - v\|_2$$
+            </div>
+          </div>
+          <ul style="padding-left: 20px; color: var(--text-secondary); font-size: 0.9rem;">
+            <li>Rotationally invariant</li>
+            <li>Satisfies all metric axioms</li>
+            <li>Sensitive to feature scale and high-dimensional noise</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3 class="pill-man">Manhattan Distance ($L_1$)</h3>
+          <p>Measures grid-based distance along orthogonal coordinate axes (Taxicab metric).</p>
+          <div class="metric-box">
+            <div class="metric-title">Formula</div>
+            <div style="font-size: 1.05rem; margin: 8px 0; color:#fca5a5;">
+              $$d(u, v) = \sum_{i=1}^n |u_i - v_i| = \|u - v\|_1$$
+            </div>
+          </div>
+          <ul style="padding-left: 20px; color: var(--text-secondary); font-size: 0.9rem;">
+            <li>Diamond-shaped iso-distance contours</li>
+            <li>Robust to extreme outlier dimensions</li>
+            <li>Maintains higher contrast in higher dimensions</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3 class="pill-cos">Cosine Distance ($D_{cos}$)</h3>
+          <p>Measures angular orientation difference between vectors, ignoring vector magnitude.</p>
+          <div class="metric-box">
+            <div class="metric-title">Formula</div>
+            <div style="font-size: 1.05rem; margin: 8px 0; color:#6ee7b7;">
+              $$D_{cos} = 1 - \frac{u \cdot v}{\|u\|_2 \|v\|_2} = 1 - \cos(\theta)$$
+            </div>
+          </div>
+          <ul style="padding-left: 20px; color: var(--text-secondary); font-size: 0.9rem;">
+            <li>Scale & magnitude invariant</li>
+            <li>Ideal for sparse, high-dimensional TF-IDF & embeddings</li>
+            <li>Bounded in $[0, 2]$ (or $[0, 1]$ for positive spaces)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Theoretical Comparison Matrix</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Euclidean ($L_2$)</th>
+              <th>Manhattan ($L_1$)</th>
+              <th>Cosine Distance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Geometric Shape</strong></td>
+              <td>Sphere / Circle ($L_2$ ball)</td>
+              <td>Cross-Polytope / Diamond ($L_1$ ball)</td>
+              <td>Hyper-cone / Angular ray</td>
+            </tr>
+            <tr>
+              <td><strong>Magnitude Dependency</strong></td>
+              <td>Directly dependent</td>
+              <td>Directly dependent</td>
+              <td><strong>Magnitude Invariant</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Outlier Sensitivity</strong></td>
+              <td>High (squared penalty)</td>
+              <td>Moderate (linear penalty)</td>
+              <td>Low (normalized)</td>
+            </tr>
+            <tr>
+              <td><strong>High-D Sparse Text / TF-IDF</strong></td>
+              <td>Poor (length-biased)</td>
+              <td>Moderate</td>
+              <td><strong>Superior (Best)</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Computational Complexity</strong></td>
+              <td>$\mathcal{O}(D)$ (multiplications + sqrt)</td>
+              <td>$\mathcal{O}(D)$ (subtraction + abs)</td>
+              <td>$\mathcal{O}(D)$ (dot + 2 norms)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 2: Live Vector Calculator -->
+    <div id="tab-calculator" class="tab-content">
+      <div class="grid-2">
+        <div class="card">
+          <h2>Input Vector Pair</h2>
+          <div class="form-group">
+            <label>Vector $u$ (Comma-separated numbers):</label>
+            <input type="text" id="vec-u" value="1.0, 2.0, 3.0, 4.0">
+          </div>
+          <div class="form-group">
+            <label>Vector $v$ (Comma-separated numbers):</label>
+            <input type="text" id="vec-v" value="2.0, 4.0, 6.0, 8.0">
+          </div>
+          <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+            <button class="btn" onclick="calculateDistance()">Calculate Distances</button>
+            <button class="btn btn-secondary" onclick="loadPreset('collinear')">Preset: Collinear</button>
+            <button class="btn btn-secondary" onclick="loadPreset('orthogonal')">Preset: Orthogonal</button>
+            <button class="btn btn-secondary" onclick="loadPreset('outlier')">Preset: Outlier</button>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            Tip: Collinear vectors have Cosine Distance = 0 regardless of magnitude, but large Euclidean/Manhattan distances!
+          </p>
+        </div>
+
+        <div class="card">
+          <h2>Calculated Distance Metrics</h2>
+          <div id="calc-results">
+            <div class="metric-box">
+              <div class="metric-title">Euclidean Distance ($L_2$)</div>
+              <div class="metric-val" id="res-euc">-</div>
+              <div class="formula-chip" id="res-euc-formula">sqrt(sum(diff^2))</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-title">Manhattan Distance ($L_1$)</div>
+              <div class="metric-val" id="res-man">-</div>
+              <div class="formula-chip" id="res-man-formula">sum(|diff|)</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-title">Cosine Similarity & Distance</div>
+              <div class="metric-val" id="res-cos">-</div>
+              <div class="formula-chip" id="res-cos-formula">Similarity: -, Angle: -°</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: 2D Boundary Playground -->
+    <div id="tab-playground" class="tab-content">
+      <div class="grid-2">
+        <div class="card">
+          <h2>Interactive KNN Controls</h2>
+          <div class="form-group">
+            <label>Benchmark Dataset:</label>
+            <select id="play-dataset" onchange="updateBoundaryPlot()">
+              <option value="iris">Iris Flower Dataset (2D PCA Projection)</option>
+              <option value="wine">Wine Recognition Dataset (2D PCA Projection)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Distance Metric:</label>
+            <select id="play-metric" onchange="updateBoundaryPlot()">
+              <option value="euclidean">Euclidean Distance (L2 - Smooth boundaries)</option>
+              <option value="manhattan">Manhattan Distance (L1 - Blocky grid boundaries)</option>
+              <option value="cosine">Cosine Distance (Angular ray boundaries)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Number of Neighbors ($k$): <span id="k-label" style="color:var(--accent-cyan); font-weight:bold;">5</span></label>
+            <input type="range" id="play-k" min="1" max="25" step="2" value="5" oninput="document.getElementById('k-label').innerText = this.value; updateBoundaryPlot()" style="width:100%;">
+          </div>
+          <button class="btn" onclick="updateBoundaryPlot()">Refresh Boundary</button>
+        </div>
+
+        <div class="card">
+          <h2>Decision Boundary Visualization</h2>
+          <div class="canvas-wrapper">
+            <canvas id="boundaryCanvas" width="500" height="400"></canvas>
+          </div>
+          <div id="canvas-legend" style="margin-top: 10px; display: flex; gap: 15px; font-size: 0.85rem; justify-content: center;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: Multi-Dataset Benchmarks -->
+    <div id="tab-benchmarks" class="tab-content">
+      <div class="card">
+        <h2>Experimental Results Across Multi-Domain Benchmarks</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Dataset</th>
+              <th>Data Characteristics</th>
+              <th>Distance Metric</th>
+              <th>Accuracy (%)</th>
+              <th>Weighted F1</th>
+              <th>Query Latency (ms)</th>
+              <th>Performance Rank</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Iris -->
+            <tr>
+              <td rowspan="3"><strong>Iris</strong></td>
+              <td rowspan="3">Low-D Dense (4-D, 3 classes)</td>
+              <td class="pill-euc">Euclidean ($L_2$)</td>
+              <td><strong>92.11%</strong></td>
+              <td>0.9200</td>
+              <td>0.031 ms</td>
+              <td>🥇 Top Performer</td>
+            </tr>
+            <tr>
+              <td class="pill-man">Manhattan ($L_1$)</td>
+              <td><strong>92.11%</strong></td>
+              <td>0.9200</td>
+              <td>0.008 ms</td>
+              <td>🥇 Top Performer</td>
+            </tr>
+            <tr>
+              <td class="pill-cos">Cosine</td>
+              <td>78.95%</td>
+              <td>0.7844</td>
+              <td>0.009 ms</td>
+              <td>🥉 Sensitive to origin scale</td>
+            </tr>
+            <!-- Wine -->
+            <tr style="border-top: 2px solid var(--border-color);">
+              <td rowspan="3"><strong>Wine</strong></td>
+              <td rowspan="3">Medium-D Dense (13-D, 3 classes)</td>
+              <td class="pill-man">Manhattan ($L_1$)</td>
+              <td><strong>97.78%</strong></td>
+              <td><strong>0.9779</strong></td>
+              <td>0.011 ms</td>
+              <td>🥇 Top Performer</td>
+            </tr>
+            <tr>
+              <td class="pill-cos">Cosine</td>
+              <td><strong>97.78%</strong></td>
+              <td><strong>0.9779</strong></td>
+              <td>0.008 ms</td>
+              <td>🥇 Top Performer</td>
+            </tr>
+            <tr>
+              <td class="pill-euc">Euclidean ($L_2$)</td>
+              <td>93.33%</td>
+              <td>0.9337</td>
+              <td>0.021 ms</td>
+              <td>🥈 High accuracy</td>
+            </tr>
+            <!-- Digits -->
+            <tr style="border-top: 2px solid var(--border-color);">
+              <td rowspan="3"><strong>Optical Digits</strong></td>
+              <td rowspan="3">High-D Pixels (64-D, 10 classes)</td>
+              <td class="pill-euc">Euclidean ($L_2$)</td>
+              <td><strong>98.22%</strong></td>
+              <td><strong>0.9821</strong></td>
+              <td>0.066 ms</td>
+              <td>🥇 Best image match</td>
+            </tr>
+            <tr>
+              <td class="pill-man">Manhattan ($L_1$)</td>
+              <td>98.00%</td>
+              <td>0.9799</td>
+              <td>0.736 ms</td>
+              <td>🥈 High accuracy</td>
+            </tr>
+            <tr>
+              <td class="pill-cos">Cosine</td>
+              <td>98.00%</td>
+              <td>0.9799</td>
+              <td>0.028 ms</td>
+              <td>🥈 High accuracy</td>
+            </tr>
+            <!-- Text -->
+            <tr style="border-top: 2px solid var(--border-color);">
+              <td rowspan="3"><strong>TF-IDF Text</strong></td>
+              <td rowspan="3">High-D Sparse (292-D, 4 topics)</td>
+              <td class="pill-cos">Cosine</td>
+              <td><strong>59.38%</strong></td>
+              <td><strong>0.5975</strong></td>
+              <td>0.022 ms</td>
+              <td>🥇 Scale invariant winner</td>
+            </tr>
+            <tr>
+              <td class="pill-euc">Euclidean ($L_2$)</td>
+              <td>59.38%</td>
+              <td>0.5975</td>
+              <td>0.033 ms</td>
+              <td>🥇 Tied on normalized text</td>
+            </tr>
+            <tr>
+              <td class="pill-man">Manhattan ($L_1$)</td>
+              <td>46.88%</td>
+              <td>0.4852</td>
+              <td>0.193 ms</td>
+              <td>🥉 Degraded on sparse text</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 5: Semantic Similarity Search -->
+    <div id="tab-search" class="tab-content">
+      <div class="card">
+        <h2>Semantic Document Retrieval Engine</h2>
+        <div class="grid-2">
+          <div>
+            <div class="form-group">
+              <label>Search Query / Concept:</label>
+              <input type="text" id="search-query" value="neural network deep learning artificial intelligence">
+            </div>
+            <div class="form-group">
+              <label>Distance Metric:</label>
+              <select id="search-metric">
+                <option value="cosine">Cosine Distance (Recommended for Text)</option>
+                <option value="euclidean">Euclidean Distance</option>
+                <option value="manhattan">Manhattan Distance</option>
+              </select>
+            </div>
+            <button class="btn" onclick="executeSearch()">Search Most Similar Documents</button>
+          </div>
+          <div>
+            <h3>Top Retrieved Documents</h3>
+            <div id="search-results-box" style="display: flex; flex-direction: column; gap: 10px;">
+              <p style="color:var(--text-muted);">Click "Search Most Similar Documents" to retrieve results.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: Publication Figures -->
+    <div id="tab-gallery" class="tab-content">
+      <div class="card">
+        <h2>Generated Publication Figures & Analytics</h2>
+        <div class="figure-gallery">
+          <div class="figure-card">
+            <img src="/results/unit_balls_geometry.png" alt="Unit Ball Geometry">
+            <h4>1. Geometric Unit Balls ($L_1, L_2, L_\infty$)</h4>
+            <p>Visualizing iso-distance contours and angular vector mechanics.</p>
+          </div>
+          <div class="figure-card">
+            <img src="/results/decision_boundaries.png" alt="Decision Boundaries">
+            <h4>2. Decision Boundary Topologies</h4>
+            <p>2D projection comparisons showing grid vs smooth vs angular partitions.</p>
+          </div>
+          <div class="figure-card">
+            <img src="/results/metrics_comparison.png" alt="Metrics Comparison">
+            <h4>3. Multi-Dataset Performance Comparison</h4>
+            <p>Bar charts of Accuracy and F1 across Iris, Wine, Digits, and Text.</p>
+          </div>
+          <div class="figure-card">
+            <img src="/results/k_vs_accuracy.png" alt="K-Sweep Accuracy">
+            <h4>4. Hyperparameter Sensitivity ($k=1 \dots 25$)</h4>
+            <p>Accuracy trajectories vs neighborhood size.</p>
+          </div>
+          <div class="figure-card">
+            <img src="/results/curse_of_dimensionality.png" alt="Curse of Dimensionality">
+            <h4>5. The Curse of Dimensionality</h4>
+            <p>Distance contrast decay from $D=2$ to $D=1000$ dimensions.</p>
+          </div>
+          <div class="figure-card">
+            <img src="/results/confusion_matrices_wine.png" alt="Confusion Matrix Wine">
+            <h4>6. Multi-Metric Confusion Matrices (Wine)</h4>
+            <p>True vs Predicted label heatmaps per distance metric.</p>
+          </div>
+          <div class="figure-card">
+            <img src="/results/confusion_matrices_text.png" alt="Confusion Matrix Text">
+            <h4>7. Multi-Metric Confusion Matrices (Text)</h4>
+            <p>Document classification confusion heatmaps.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
